@@ -76,37 +76,34 @@ const gn = (domain, lang = "ka") => lang === "ka"
    lang     : "ka" | "en"  (ჩანს მხოლოდ შესაბამისი ენის არჩევისას)
    ===================================================================== */
 const SOURCES = [
-  // ⚔️ სამხედრო, უკრაინისა და ირანის/ახლო აღმოსავლეთის კონფლიქტები, შეიარაღება
-  { name: "ISW (War Studies)", url: gn("understandingwar.org", "en"), category: "military", lang: "en" },
-  { name: "The War Zone (TWZ)", url: gn("twz.com", "en"), category: "military", lang: "en" },
-  { name: "The Guardian (World News)", url: gn("theguardian.com/world", "en"), category: "military", lang: "en" },
-  { name: "Defence Blog", url: gn("defence-blog.com", "en"), category: "military", lang: "en" },
-  { name: "Defense News", url: gn("defensenews.com", "en"), category: "military", lang: "en" },
-  { name: "Ukrinform (Ukraine War)", url: gn("ukrinform.net", "en"), category: "military", lang: "en" },
-  { name: "Civil.ge (Military/Sec)", url: gn("civil.ge"), category: "military", lang: "ka" },
+  // ⚔️ სამხედრო / კონფლიქტები
+  { name: "ISW (War Studies)", url: "https://understandingwar.org/rss.xml", category: "military", lang: "en" },
+  { name: "The War Zone (TWZ)", url: "https://twz.com/feed", category: "military", lang: "en" },
+  { name: "The Guardian (World)", url: "https://www.theguardian.com/world/rss", category: "military", lang: "en" },
+  { name: "Defence Blog", url: "https://defence-blog.com/feed/", category: "military", lang: "en" },
+  { name: "Civil.ge (Military/Sec)", url: "https://civil.ge/ka/feed", category: "military", lang: "ka" },
 
   // 🏛️ პოლიტიკა / ტელეარხები / ზოგადი
-  { name: "IPN", url: gn("interpressnews.ge"), category: "politics", lang: "ka" },
-  { name: "ტვ პირველი", url: gn("tvpirveli.ge"), category: "politics", lang: "ka" },
-  { name: "მთავარი არხი", url: gn("mtavari.tv"), category: "politics", lang: "ka" },
-  { name: "იმედი", url: gn("imedinews.ge"), category: "politics", lang: "ka" },
-  { name: "ფორმულა", url: gn("formulanews.ge"), category: "politics", lang: "ka" },
-  { name: "რადიო თავისუფლება", url: gn("radiotavisupleba.ge"), category: "politics", lang: "ka" },
-  { name: "BBC World", url: gn("bbc.com/news", "en"), category: "politics", lang: "en" },
+  { name: "IPN", url: "https://www.interpressnews.ge/rss/ka", category: "politics", lang: "ka" },
+  { name: "ტვ პირველი", url: "https://news.google.com/rss/search?q=site:tvpirveli.ge", category: "politics", lang: "ka" },
+  { name: "მთავარი არხი", url: "https://news.google.com/rss/search?q=site:mtavari.tv", category: "politics", lang: "ka" },
+  { name: "იმედი", url: "https://news.google.com/rss/search?q=site:imedinews.ge", category: "politics", lang: "ka" },
+  { name: "ფორმულა", url: "https://news.google.com/rss/search?q=site:formulanews.ge", category: "politics", lang: "ka" },
+  { name: "რადიო თავისუფლება", url: "https://www.radiotavisupleba.ge/api/z--qqpieqv", category: "politics", lang: "ka" },
+  { name: "BBC World", url: "http://feeds.bbci.co.uk/news/world/rss.xml", category: "politics", lang: "en" },
 
   // ⚽ სპორტი
-  { name: "აჭარასპორტი", url: gn("adjarasport.com"), category: "sports", lang: "ka" },
-  { name: "Crystalsport", url: gn("crystalsport.ge"), category: "sports", lang: "ka" },
-  { name: "Lelo.ge", url: gn("lelo.ge"), category: "sports", lang: "ka" },
-  { name: "BBC Sport", url: gn("bbc.com/sport", "en"), category: "sports", lang: "en" },
+  { name: "აჭარასპორტი", url: "https://news.google.com/rss/search?q=site:adjarasport.com", category: "sports", lang: "ka" },
+  { name: "Crystalsport", url: "https://news.google.com/rss/search?q=site:crystalsport.ge", category: "sports", lang: "ka" },
+  { name: "Lelo.ge", url: "https://lelo.ge/feed/", category: "sports", lang: "ka" },
+  { name: "BBC Sport", url: "http://feeds.bbci.co.uk/sport/rss.xml", category: "sports", lang: "en" },
 
   // 💻 ტექნოლოგიები
-  { name: "Marketer.ge", url: gn("marketer.ge"), category: "tech", lang: "ka" },
-  { name: "Dev.ge", url: gn("dev.ge"), category: "tech", lang: "ka" },
-  { name: "The Verge", url: gn("theverge.com", "en"), category: "tech", lang: "en" },
-  { name: "TechCrunch", url: gn("techcrunch.com", "en"), category: "tech", lang: "en" },
+  { name: "Marketer.ge", url: "https://www.marketer.ge/feed/", category: "tech", lang: "ka" },
+  { name: "Dev.ge", url: "https://dev.ge/feed", category: "tech", lang: "ka" },
+  { name: "The Verge", url: "https://www.theverge.com/rss/index.xml", category: "tech", lang: "en" },
+  { name: "TechCrunch", url: "https://techcrunch.com/feed/", category: "tech", lang: "en" }
 ];
-
 /* კატეგორიები (ფერი + სახელები ორ ენაზე) */
 const CATEGORIES = {
   all:      { color: '#64748b', ka: 'ყველა',                 en: 'All' },
