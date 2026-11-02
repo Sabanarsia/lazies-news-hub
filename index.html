@@ -193,7 +193,7 @@ const PROXIES = [
   u => 'https://corsproxy.io/?' + encodeURIComponent(u),
   u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
 ];
-async function timedFetch(url, ms = 12000) {
+async function timedFetch(url, ms = 8000) {
   const ctl = new AbortController(); const id = setTimeout(() => ctl.abort(), ms);
   try {
     const r = await fetch(url, { signal: ctl.signal });
@@ -211,37 +211,48 @@ function parseXml(text) {
     title: g(n, 'title'), description: g(n, 'description'), link: g(n, 'link'), pubDate: g(n, 'pubDate'),
   }));
 }
+/* სამივე პროქსის ერთდროულად ვაკითხებთ (Promise.any) — იმარჯვებს ყველაზე სწრაფი სწორი პასუხი.
+   თითო პროქსის 8 წამი აქვს, ამიტომ ერთი არხი მაქსიმუმ 8 წამში მთავრდება და ვერაფერი "გაიჭედება". */
 async function loadSource(src) {
   if (state.cache.has(src.url)) return;
-  for (const proxy of PROXIES) {
-    try {
+  try {
+    const items = await Promise.any(PROXIES.map(async proxy => {
       const res = await timedFetch(proxy(src.url));
-      const items = parseXml(await res.text());
-      state.cache.set(src.url, items.map(it => ({
-        src, ...cleanText(src, it),
-        date: parseDate(it.pubDate), link: it.link, img: pickImage(it),
-      })));
-      state.failed.delete(src.name);
-      return;
-    } catch (e) { /* ვცდით შემდეგ პროქსის */ }
+      return parseXml(await res.text());
+    }));
+    state.cache.set(src.url, items.map(it => ({
+      src, ...cleanText(src, it),
+      date: parseDate(it.pubDate), link: it.link, img: pickImage(it),
+    })));
+    state.failed.delete(src.name);
+  } catch (e) {
+    state.failed.add(src.name);
   }
-  state.failed.add(src.name);
 }
-/* პროქსებს ერთბაშად 12+ მოთხოვნას არ ვუგზავნით (ლიმიტის თავიდან ასაცილებლად) — მაქსიმუმ 4 პარალელურად */
-async function runPool(list, worker, size = 4) {
+/* მაქსიმუმ 6 არხი პარალელურად; ყოველი დასრულებული არხის შემდეგ ეკრანი მაშინვე განახლდება */
+async function runPool(list, worker, size = 6) {
   const queue = [...list];
-  await Promise.all(Array.from({ length: size }, async () => { while (queue.length) await worker(queue.shift()); }));
+  await Promise.all(Array.from({ length: size }, async () => {
+    while (queue.length) { await worker(queue.shift()); render(); }
+  }));
 }
+let loadToken = 0;
 async function load(force = false) {
   if (force) { state.cache.clear(); state.failed.clear(); }
   const missing = activeSources().filter(s => !state.cache.has(s.url));
   if (!missing.length) { render(); return; }
+  const token = ++loadToken;
   state.loading = true; render();
   $('refresh-ico').classList.add('animate-spin');
-  await runPool(missing, loadSource);
-  state.loading = false;
-  $('refresh-ico').classList.remove('animate-spin');
-  render();
+  try {
+    await runPool(missing, loadSource);
+  } finally {
+    if (token === loadToken) {          // ახალი ჩატვირთვა თუ არ დაწყებულა
+      state.loading = false;
+      $('refresh-ico').classList.remove('animate-spin');
+      render();
+    }
+  }
 }
 
 /* ---------- Render ---------- */
