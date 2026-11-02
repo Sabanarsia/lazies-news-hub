@@ -1,337 +1,348 @@
 <!DOCTYPE html>
-<html lang="ka" class="dark">
+<html lang="ka">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ზარმაცების ნიუსჰაბი - Lazies NewsHub</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0f172a',
-                        cardBg: '#1e293b'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Noto+Sans+Georgian:wght@400;500;700&display=swap');
-        body { font-family: 'Noto Sans Georgian', 'Fira Code', sans-serif; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lazies NewsHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: {
+    sans: ['"Noto Sans Georgian"', 'system-ui', 'sans-serif'],
+    serif: ['"Noto Serif Georgian"', 'Georgia', 'serif'] } } } };
+</script>
+<style>
+  body { background: #f3f5f8; }
+  .dark body { background: #0e1420; }
+  .clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .chips { scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  @keyframes pulse2 { 50% { opacity: .45; } }
+  .skel { animation: pulse2 1.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .skel, .animate-spin { animation: none; } }
+</style>
 </head>
-<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
+<body class="font-sans text-slate-800 dark:text-slate-100 min-h-screen">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/80 dark:bg-cardBg/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg">
-                    <i data-lucide="newspaper" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 id="site-title" class="text-xl font-bold tracking-tight">ზარმაცების ნიუსჰაბი</h1>
-                    <p id="site-subtitle" class="text-xs text-slate-500 dark:text-slate-400">ყველა მნიშვნელოვანი ამბავი ერთ სივრცეში</p>
-                </div>
-            </div>
+<header class="sticky top-0 z-20 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#0e1420]/90 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+    <h1 class="font-serif text-xl font-bold tracking-tight mr-auto" id="t-title"></h1>
+    <div class="relative order-last sm:order-none w-full sm:w-72">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" autocomplete="off" class="w-full pl-9 pr-3 py-2 rounded-lg text-sm bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-sky-500 focus:outline-none placeholder-slate-400">
+    </div>
+    <div class="flex rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 text-sm" role="group" aria-label="Language">
+      <button data-lang="ka" class="lang-btn px-3 py-1.5">ქარ</button>
+      <button data-lang="en" class="lang-btn px-3 py-1.5">EN</button>
+    </div>
+    <button id="refresh" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Refresh">
+      <svg id="refresh-ico" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>
+    </button>
+    <button id="theme" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Theme">
+      <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+  <div class="max-w-6xl mx-auto px-4">
+    <nav id="tabs" class="chips flex gap-1 overflow-x-auto" aria-label="Categories"></nav>
+  </div>
+  <div class="max-w-6xl mx-auto px-4 py-2.5 border-t border-slate-100 dark:border-slate-800/60">
+    <div id="chips" class="chips flex gap-2 overflow-x-auto"></div>
+  </div>
+</header>
 
-            <!-- Search Bar -->
-            <div class="w-full md:w-96 relative">
-                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                <input type="text" id="search-input" placeholder="ძებნა სათაურებში..." 
-                    class="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-            </div>
+<main class="max-w-6xl mx-auto px-4 py-6">
+  <p id="status" class="text-sm text-slate-500 dark:text-slate-400 mb-4"></p>
+  <div id="errors" class="mb-4"></div>
+  <div id="grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+  <div id="empty" class="hidden text-center py-20 text-slate-500 dark:text-slate-400"></div>
+</main>
 
-            <!-- Controls (Lang & Theme & Refresh) -->
-            <div class="flex items-center gap-3">
-                <button id="lang-btn" class="px-3 py-1.5 text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg transition-colors">EN</button>
-                <button id="refresh-btn" class="p-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg transition-colors" title="განახლება">
-                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-                </button>
-                <button id="theme-btn" class="p-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg transition-colors" title="თემა">
-                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
-                </button>
-            </div>
-        </div>
+<script>
+/* ყველა წყარო იკითხება Google News RSS-ის site: ძებნით.
+   gn("example.ge") — ქართული გამოცემა, gn("example.com", "en") — ინგლისური.
+   დომენს შეიძლება გზაც დაემატოს, მაგ. gn("bbc.com/sport", "en"). */
+const gn = (domain, lang = "ka") => lang === "ka"
+  ? `https://news.google.com/rss/search?q=site:${domain}&hl=ka&gl=GE&ceid=GE:ka`
+  : `https://news.google.com/rss/search?q=site:${domain}&hl=en-US&gl=US&ceid=US:en`;
 
-        <!-- Categories & Sources Nav -->
-        <div class="max-w-7xl mx-auto px-4 py-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-            <div id="category-tabs" class="flex items-center gap-2 overflow-x-auto pb-1 text-sm">
-                <!-- Dynamically filled -->
-            </div>
-        </div>
-    </header>
+/* =====================================================================
+   SOURCES — ახალი RSS არხის დასამატებლად დააკოპირეთ ერთი ხაზი და შეცვალეთ:
+   name     : წყაროს სახელი, რომელიც ბარათზე გამოჩნდება
+   url      : RSS ბმული (იტვირთება CORS პროქსით და ბრაუზერშივე პარსდება)
+   category : "military" | "politics" | "sports" | "tech"
+   lang     : "ka" | "en"  (ჩანს მხოლოდ შესაბამისი ენის არჩევისას)
+   ===================================================================== */
+const SOURCES = [
+  // ⚔️ სამხედრო, უკრაინისა და ირანის/ახლო აღმოსავლეთის კონფლიქტები, შეიარაღება
+  { name: "ISW (War Studies)", url: gn("understandingwar.org", "en"), category: "military", lang: "en" },
+  { name: "The War Zone (TWZ)", url: gn("twz.com", "en"), category: "military", lang: "en" },
+  { name: "The Guardian (World News)", url: gn("theguardian.com/world", "en"), category: "military", lang: "en" },
+  { name: "Defence Blog", url: gn("defence-blog.com", "en"), category: "military", lang: "en" },
+  { name: "Defense News", url: gn("defensenews.com", "en"), category: "military", lang: "en" },
+  { name: "Ukrinform (Ukraine War)", url: gn("ukrinform.net", "en"), category: "military", lang: "en" },
+  { name: "Civil.ge (Military/Sec)", url: gn("civil.ge"), category: "military", lang: "ka" },
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <!-- Status / Errors -->
-        <div id="error-banner" class="hidden mb-6 p-4 bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm rounded-xl"></div>
+  // 🏛️ პოლიტიკა / ტელეარხები / ზოგადი
+  { name: "IPN", url: gn("interpressnews.ge"), category: "politics", lang: "ka" },
+  { name: "ტვ პირველი", url: gn("tvpirveli.ge"), category: "politics", lang: "ka" },
+  { name: "მთავარი არხი", url: gn("mtavari.tv"), category: "politics", lang: "ka" },
+  { name: "იმედი", url: gn("imedinews.ge"), category: "politics", lang: "ka" },
+  { name: "ფორმულა", url: gn("formulanews.ge"), category: "politics", lang: "ka" },
+  { name: "რადიო თავისუფლება", url: gn("radiotavisupleba.ge"), category: "politics", lang: "ka" },
+  { name: "BBC World", url: gn("bbc.com/news", "en"), category: "politics", lang: "en" },
 
-        <!-- News Grid -->
-        <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Skeletons loading -->
-            <div class="bg-white dark:bg-cardBg rounded-2xl p-4 border border-slate-200 dark:border-slate-700 animate-pulse">
-                <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl mb-4"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4 mb-2"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
-            </div>
-            <div class="bg-white dark:bg-cardBg rounded-2xl p-4 border border-slate-200 dark:border-slate-700 animate-pulse">
-                <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl mb-4"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4 mb-2"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
-            </div>
-            <div class="bg-white dark:bg-cardBg rounded-2xl p-4 border border-slate-200 dark:border-slate-700 animate-pulse">
-                <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl mb-4"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4 mb-2"></div>
-                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
-            </div>
-        </div>
-    </main>
+  // ⚽ სპორტი
+  { name: "აჭარასპორტი", url: gn("adjarasport.com"), category: "sports", lang: "ka" },
+  { name: "Crystalsport", url: gn("crystalsport.ge"), category: "sports", lang: "ka" },
+  { name: "Lelo.ge", url: gn("lelo.ge"), category: "sports", lang: "ka" },
+  { name: "BBC Sport", url: gn("bbc.com/sport", "en"), category: "sports", lang: "en" },
 
-    <!-- JavaScript Application Logic -->
-    <script>
-        // SOURCES - 100% სტაბილური Google News და პირდაპირი RSS არხები
-        const SOURCES = [
-            // ⚔️ სამხედრო / კონფლიქტები
-            { name: "ISW (War Studies)", url: "https://understandingwar.org/rss.xml", category: "military", lang: "en" },
-            { name: "The War Zone (TWZ)", url: "https://twz.com/feed", category: "military", lang: "en" },
-            { name: "The Guardian", url: "https://www.theguardian.com/world/rss", category: "military", lang: "en" },
-            { name: "Civil.ge (Military)", url: "https://civil.ge/ka/feed", category: "military", lang: "ka" },
+  // 💻 ტექნოლოგიები
+  { name: "Marketer.ge", url: gn("marketer.ge"), category: "tech", lang: "ka" },
+  { name: "Dev.ge", url: gn("dev.ge"), category: "tech", lang: "ka" },
+  { name: "The Verge", url: gn("theverge.com", "en"), category: "tech", lang: "en" },
+  { name: "TechCrunch", url: gn("techcrunch.com", "en"), category: "tech", lang: "en" },
+];
 
-            // 🏛️ პოლიტიკა / ტელეარხები / ზოგადი
-            { name: "IPN", url: "https://news.google.com/rss/search?q=site:interpressnews.ge", category: "politics", lang: "ka" },
-            { name: "ტვ პირველი", url: "https://news.google.com/rss/search?q=site:tvpirveli.ge", category: "politics", lang: "ka" },
-            { name: "მთავარი არხი", url: "https://news.google.com/rss/search?q=site:mtavari.tv", category: "politics", lang: "ka" },
-            { name: "იმედი", url: "https://news.google.com/rss/search?q=site:imedinews.ge", category: "politics", lang: "ka" },
-            { name: "ფორმულა", url: "https://news.google.com/rss/search?q=site:formulanews.ge", category: "politics", lang: "ka" },
-            { name: "რადიო თავისუფლება", url: "https://www.radiotavisupleba.ge/api/z--qqpieqv", category: "politics", lang: "ka" },
-            { name: "BBC World", url: "http://feeds.bbci.co.uk/news/world/rss.xml", category: "politics", lang: "en" },
+/* კატეგორიები (ფერი + სახელები ორ ენაზე) */
+const CATEGORIES = {
+  all:      { color: '#64748b', ka: 'ყველა',                 en: 'All' },
+  military: { color: '#ef4444', ka: 'სამხედრო / კონფლიქტები', en: 'Military' },
+  politics: { color: '#0ea5e9', ka: 'პოლიტიკა',              en: 'Politics' },
+  sports:   { color: '#22c55e', ka: 'სპორტი',                en: 'Sports' },
+  tech:     { color: '#8b5cf6', ka: 'ტექნოლოგიები',          en: 'Tech' },
+};
 
-            // ⚽ სპორტი
-            { name: "აჭარასპორტი", url: "https://news.google.com/rss/search?q=site:adjarasport.com", category: "sports", lang: "ka" },
-            { name: "Crystalsport", url: "https://news.google.com/rss/search?q=site:crystalsport.ge", category: "sports", lang: "ka" },
-            { name: "Lelo.ge", url: "https://lelo.ge/feed/", category: "sports", lang: "ka" },
-            { name: "BBC Sport", url: "http://feeds.bbci.co.uk/sport/rss.xml", category: "sports", lang: "en" },
+const REFRESH_MS = 10 * 60 * 1000;
 
-            // 💻 ტექნოლოგიები
-            { name: "Marketer.ge", url: "https://www.marketer.ge/feed/", category: "tech", lang: "ka" },
-            { name: "Dev.ge", url: "https://dev.ge/feed", category: "tech", lang: "ka" },
-            { name: "The Verge", url: "https://www.theverge.com/rss/index.xml", category: "tech", lang: "en" },
-            { name: "TechCrunch", url: "https://techcrunch.com/feed/", category: "tech", lang: "en" }
-        ];
+const I18N = {
+  ka: { title: 'ზარმაცების ნიუსჰაბი', search: 'ძებნა სათაურებში…', allSrc: 'ყველა წყარო', read: 'სრულად წაკითხვა',
+        loading: 'იტვირთება…', count: n => `ნაჩვენებია ${n} სიახლე`, none: 'სიახლე ვერ მოიძებნა. სცადეთ სხვა სიტყვა ან ფილტრი.',
+        err: n => `ვერ ჩაიტვირთა: ${n}`, locale: 'ka' },
+  en: { title: 'Lazies NewsHub', search: 'Search headlines…', allSrc: 'All sources', read: 'Read full story',
+        loading: 'Loading…', count: n => `Showing ${n} stories`, none: 'No stories found. Try another word or filter.',
+        err: n => `Couldn’t load: ${n}`, locale: 'en' },
+};
 
-        const CATEGories = {
-            ka: { all: 'ყველა', military: 'სამხედრო / კონფლიქტები', politics: 'პოლიტიკა', sports: 'სპორტი', tech: 'ტექნოლოგიები' },
-            en: { all: 'All', military: 'Military / Conflicts', politics: 'Politics', sports: 'Sports', tech: 'Tech' }
-        };
+/* ---------- State ---------- */
+const safe = (fn, d) => { try { return fn(); } catch { return d; } };
+const savedDark = safe(() => localStorage.getItem('dark'), null);
+const state = {
+  lang: safe(() => localStorage.getItem('lang'), null) === 'en' ? 'en' : 'ka',
+  dark: savedDark === null ? matchMedia('(prefers-color-scheme: dark)').matches : savedDark === '1',
+  category: 'all', source: 'all', query: '',
+  cache: new Map(),   // feed url -> articles
+  failed: new Set(), loading: false,
+};
+const $ = id => document.getElementById(id);
+const t = k => I18N[state.lang][k];
+const activeSources = () => SOURCES.filter(s => s.lang === state.lang);
 
-        let currentLang = localStorage.getItem('news_lang') || 'ka';
-        let currentCategory = 'all';
-        let searchQuery = '';
-        let allArticles = [];
-        let failedSources = [];
+/* ---------- Helpers ---------- */
+function stripHtml(html) {
+  const d = document.createElement('div'); d.innerHTML = html || '';
+  return (d.textContent || '').replace(/\s+/g, ' ').trim();
+}
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function parseDate(s) {
+  const d = new Date(String(s || '').replace(' ', 'T') + 'Z');
+  return isNaN(d) ? new Date(s) : d;
+}
+function timeAgo(date) {
+  if (!date || isNaN(date)) return '';
+  const rtf = new Intl.RelativeTimeFormat(t('locale'), { numeric: 'auto' });
+  const diff = (date - Date.now()) / 1000;
+  for (const [u, s] of [['day', 86400], ['hour', 3600], ['minute', 60]])
+    if (Math.abs(diff) >= s) return rtf.format(Math.round(diff / s), u);
+  return rtf.format(0, 'minute');
+}
+function pickImage(it) {
+  if (it.thumbnail) return it.thumbnail;
+  const e = it.enclosure;
+  if (e && e.link && /image|\.(jpe?g|png|webp)/i.test((e.type || '') + e.link)) return e.link;
+  const m = /<img[^>]+src=["']([^"']+)/i.exec(it.content || it.description || '');
+  return m ? m[1] : '';
+}
+function domainOf(url) {
+  const g = /q=site:([^&]+)/.exec(url);   // Google News proxy feeds
+  if (g) return g[1].split('/')[0];
+  return safe(() => new URL(url).hostname, '');
+}
+SOURCES.forEach(s => { s.domain = domainOf(s.url); s.color = CATEGORIES[s.category].color; });
 
-        // DOM Elements
-        const newsGrid = document.getElementById('news-grid');
-        const searchInput = document.getElementById('search-input');
-        const langBtn = document.getElementById('lang-btn');
-        const themeBtn = document.getElementById('theme-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
-        const categoryTabs = document.getElementById('category-tabs');
-        const errorBanner = document.getElementById('error-banner');
-        const siteTitle = document.getElementById('site-title');
-        const siteSubtitle = document.getElementById('site-subtitle');
+/* Google News: სათაურს ბოლოში " - გამოცემა" ემატება, აღწერა კი სათაურს იმეორებს — ვასუფთავებთ */
+function cleanText(src, it) {
+  let title = stripHtml(it.title);
+  let desc = stripHtml(it.description || it.content);
+  if (src.url.includes('news.google.com')) {
+    title = title.replace(/\s+[-–]\s+[^-–]+$/, '');
+    if (desc.startsWith(title) || desc.length < title.length + 40) desc = '';
+  }
+  return { title, desc: desc.slice(0, 260) };
+}
 
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            renderUI();
-            fetchNews();
-            
-            langBtn.addEventListener('click', toggleLang);
-            themeBtn.addEventListener('click', toggleTheme);
-            refreshBtn.addEventListener('click', fetchNews);
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = e.target.value.toLowerCase();
-                renderNews();
-            });
-        });
+/* ---------- Data ---------- */
+/* Google News RSS-ს CORS ჰედერები არ აქვს, ამიტომ XML-ს ვკითხულობთ საჯარო CORS პროქსით
+   და ბრაუზერშივე ვპარსავთ (DOMParser). პროქსები გამოიყენება რიგრიგობით: პირველი წარმატებული იმარჯვებს.
+   ახალი პროქსის დასამატებლად ჩაამატეთ ფუნქცია სიაში: url => "პროქსი-მისამართი" + encodeURIComponent(url) */
+const PROXIES = [
+  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+];
+async function timedFetch(url, ms = 12000) {
+  const ctl = new AbortController(); const id = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r;
+  } finally { clearTimeout(id); }
+}
+function parseXml(text) {
+  const doc = new DOMParser().parseFromString(text, 'text/xml');
+  if (doc.querySelector('parsererror')) throw new Error('bad xml');
+  const items = [...doc.querySelectorAll('item')];
+  if (!items.length) throw new Error('no items');
+  const g = (n, tag) => ((n.querySelector(tag) || {}).textContent || '').trim();
+  return items.slice(0, 15).map(n => ({
+    title: g(n, 'title'), description: g(n, 'description'), link: g(n, 'link'), pubDate: g(n, 'pubDate'),
+  }));
+}
+async function loadSource(src) {
+  if (state.cache.has(src.url)) return;
+  for (const proxy of PROXIES) {
+    try {
+      const res = await timedFetch(proxy(src.url));
+      const items = parseXml(await res.text());
+      state.cache.set(src.url, items.map(it => ({
+        src, ...cleanText(src, it),
+        date: parseDate(it.pubDate), link: it.link, img: pickImage(it),
+      })));
+      state.failed.delete(src.name);
+      return;
+    } catch (e) { /* ვცდით შემდეგ პროქსის */ }
+  }
+  state.failed.add(src.name);
+}
+/* პროქსებს ერთბაშად 12+ მოთხოვნას არ ვუგზავნით (ლიმიტის თავიდან ასაცილებლად) — მაქსიმუმ 4 პარალელურად */
+async function runPool(list, worker, size = 4) {
+  const queue = [...list];
+  await Promise.all(Array.from({ length: size }, async () => { while (queue.length) await worker(queue.shift()); }));
+}
+async function load(force = false) {
+  if (force) { state.cache.clear(); state.failed.clear(); }
+  const missing = activeSources().filter(s => !state.cache.has(s.url));
+  if (!missing.length) { render(); return; }
+  state.loading = true; render();
+  $('refresh-ico').classList.add('animate-spin');
+  await runPool(missing, loadSource);
+  state.loading = false;
+  $('refresh-ico').classList.remove('animate-spin');
+  render();
+}
 
-        function initTheme() {
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        }
+/* ---------- Render ---------- */
+function logo(src) {
+  return `<span class="relative inline-flex items-center justify-center w-6 h-6 rounded-md text-white text-xs font-semibold overflow-hidden shrink-0" style="background:${src.color}">
+    ${esc(src.name[0])}<img src="https://www.google.com/s2/favicons?domain=${esc(src.domain)}&sz=64" alt="" class="absolute inset-0 w-full h-full object-cover bg-white" onerror="this.remove()"></span>`;
+}
+function renderNav() {
+  $('tabs').innerHTML = Object.entries(CATEGORIES).map(([id, c]) => {
+    const on = state.category === id;
+    return `<button data-cat="${id}" class="shrink-0 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${on
+      ? '' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'}"
+      style="${on ? `border-color:${c.color};color:${c.color}` : ''}">${esc(c[state.lang])}</button>`;
+  }).join('');
+  const pool = activeSources().filter(s => state.category === 'all' || s.category === state.category);
+  const items = [{ name: t('allSrc'), id: 'all', color: '#64748b' }, ...pool.map(s => ({ name: s.name, id: s.url, color: s.color }))];
+  $('chips').innerHTML = items.map(s => {
+    const on = state.source === s.id;
+    return `<button data-src="${esc(s.id)}" class="shrink-0 flex items-center gap-2 px-3 py-1 rounded-full text-xs border transition-colors ${on
+      ? 'text-white border-transparent' : 'border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}"
+      style="${on ? `background:${s.color}` : ''}">${s.id !== 'all' ? `<span class="w-2 h-2 rounded-full" style="background:${on ? '#fff' : s.color}"></span>` : ''}${esc(s.name)}</button>`;
+  }).join('');
+}
+function card(a) {
+  return `<article class="flex flex-col rounded-2xl overflow-hidden bg-white dark:bg-[#161e2e] border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
+    ${a.img ? `<img src="${esc(a.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-44 object-cover bg-slate-200 dark:bg-slate-800" onerror="this.remove()">` : `<div class="h-1.5" style="background:${a.src.color}"></div>`}
+    <div class="flex flex-col flex-1 p-5 gap-3">
+      <div class="flex items-center gap-2 text-sm">
+        ${logo(a.src)}<span class="font-medium truncate">${esc(a.src.name)}</span>
+        <span class="ml-auto shrink-0 text-slate-500 dark:text-slate-400 text-xs" title="${esc(a.date.toLocaleString(t('locale')))}">${esc(timeAgo(a.date))}</span>
+      </div>
+      <h2 class="font-serif font-bold text-lg leading-snug clamp3">${esc(a.title)}</h2>
+      ${a.desc ? `<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed clamp3">${esc(a.desc)}</p>` : ''}
+      <a href="${esc(a.link)}" target="_blank" rel="noopener noreferrer" class="mt-auto self-start text-sm font-medium px-3.5 py-2 rounded-lg text-white hover:opacity-90" style="background:${a.src.color}">${esc(t('read'))}</a>
+    </div></article>`;
+}
+function skeleton() {
+  return Array.from({ length: 6 }, () => `<div class="skel rounded-2xl bg-white dark:bg-[#161e2e] border border-slate-200 dark:border-slate-800 p-5 space-y-3">
+    <div class="h-32 rounded-lg bg-slate-200 dark:bg-slate-800"></div><div class="h-4 w-1/3 rounded bg-slate-200 dark:bg-slate-800"></div>
+    <div class="h-5 rounded bg-slate-200 dark:bg-slate-800"></div><div class="h-5 w-4/5 rounded bg-slate-200 dark:bg-slate-800"></div></div>`).join('');
+}
+function visible() {
+  const q = state.query.trim().toLowerCase();
+  const out = [];
+  for (const s of activeSources()) {
+    if (state.category !== 'all' && s.category !== state.category) continue;
+    if (state.source !== 'all' && s.url !== state.source) continue;
+    for (const a of state.cache.get(s.url) || []) if (!q || a.title.toLowerCase().includes(q)) out.push(a);
+  }
+  return out.sort((a, b) => b.date - a.date);
+}
+function render() {
+  document.documentElement.lang = state.lang;
+  document.documentElement.classList.toggle('dark', state.dark);
+  document.title = t('title');
+  $('t-title').textContent = t('title');
+  $('search').placeholder = t('search');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.className = 'lang-btn px-3 py-1.5 ' + (b.dataset.lang === state.lang ? 'bg-sky-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800');
+  });
+  renderNav();
 
-        function toggleTheme() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-        }
+  const failed = activeSources().filter(s => state.failed.has(s.name)).map(s => s.name);
+  $('errors').innerHTML = failed.length
+    ? `<div class="text-sm rounded-lg px-3 py-2 bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200">${esc(I18N[state.lang].err(failed.join(', ')))}</div>` : '';
 
-        function toggleLang() {
-            currentLang = currentLang === 'ka' ? 'en';
-            localStorage.setItem('news_lang', currentLang);
-            renderUI();
-            fetchNews();
-        }
+  const list = visible();
+  if (state.loading && !list.length) {
+    $('status').textContent = t('loading'); $('grid').innerHTML = skeleton(); $('empty').classList.add('hidden'); return;
+  }
+  $('status').textContent = state.loading ? t('loading') : t('count')(list.length);
+  $('grid').innerHTML = list.map(card).join('');
+  $('empty').textContent = t('none');
+  $('empty').classList.toggle('hidden', state.loading || list.length > 0);
+}
 
-        function renderUI() {
-            langBtn.textContent = currentLang === 'ka' ? 'EN' : 'ქარ';
-            siteTitle.textContent = currentLang === 'ka' ? 'ზარმაცების ნიუსჰაბი' : 'Lazies NewsHub';
-            siteSubtitle.textContent = currentLang === 'ka' ? 'ყველა მნიშვნელოვანი ამბავი ერთ სივრცეში' : 'All important news in one place';
-            searchInput.placeholder = currentLang === 'ka' ? 'ძებნა სათაურებში...' : 'Search headlines...';
+/* ---------- Events ---------- */
+$('search').addEventListener('input', e => { state.query = e.target.value; render(); });
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]');
+  if (b) { state.category = b.dataset.cat; state.source = 'all'; render(); }
+});
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-src]');
+  if (b) { state.source = b.dataset.src; render(); }
+});
+document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => {
+  if (state.lang === b.dataset.lang) return;
+  state.lang = b.dataset.lang; state.source = 'all';
+  safe(() => localStorage.setItem('lang', state.lang));
+  load();   // loads only the feeds of the chosen language that aren't cached yet
+}));
+$('theme').addEventListener('click', () => {
+  state.dark = !state.dark;
+  safe(() => localStorage.setItem('dark', state.dark ? '1' : '0'));
+  render();
+});
+$('refresh').addEventListener('click', () => load(true));
 
-            // Render Category Tabs
-            const cats = CATEGories[currentLang];
-            categoryTabs.innerHTML = Object.entries(cats).map(([key, name]) => `
-                <button onclick="setCategory('${key}')" class="px-4 py-1.5 rounded-xl font-medium text-xs whitespace-nowrap transition-all ${currentCategory === key ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'}">
-                    ${name}
-                </button>
-            `).join('');
-
-            lucide.createIcons();
-        }
-
-        window.setCategory = function(cat) {
-            currentCategory = cat;
-            renderUI();
-            renderNews();
-        }
-
-        async function fetchNews() {
-            newsGrid.innerHTML = `
-                <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
-                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2 text-indigo-600"><span>იტვირთება სიახლეები...</span></i>
-                </div>
-            `;
-            lucide.createIcons();
-            errorBanner.classList.add('hidden');
-            allArticles = [];
-            failedSources = [];
-
-            // Filter sources by active language (ka or en)
-            const activeSources = SOURCES.filter(s => s.lang === currentLang);
-
-            await Promise.all(activeSources.map(async (source) => {
-                try {
-                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}`;
-                    const res = await fetch(apiUrl);
-                    const data = await res.json();
-                    
-                    if (data.status === 'ok' && data.items) {
-                        data.items.forEach(item => {
-                            allArticles.push({
-                                title: item.title,
-                                link: item.link,
-                                pubDate: new Date(item.pubDate),
-                                sourceName: source.name,
-                                category: source.category,
-                                thumbnail: item.thumbnail || item.enclosure?.link || extractImage(item.description) || null
-                            });
-                        });
-                    } else {
-                        failedSources.push(source.name);
-                    }
-                } catch (err) {
-                    failedSources.push(source.name);
-                }
-            }));
-
-            // Sort by date descending
-            allArticles.sort((a, b) => b.pubDate - a.pubDate);
-
-            if (failedSources.length > 0) {
-                errorBanner.textContent = (currentLang === 'ka' ? 'ვერ ჩაიტვირთა: ' : 'Failed to load: ') + failedSources.join(', ');
-                errorBanner.classList.remove('hidden');
-            }
-
-            renderNews();
-        }
-
-        function extractImage(htmlContent) {
-            if (!htmlContent) return null;
-            const match = htmlContent.match(/<img[^>]+src="([^">]+)"/);
-            return match ? match[1] : null;
-        }
-
-        function renderNews() {
-            let filtered = allArticles;
-
-            if (currentCategory !== 'all') {
-                filtered = filtered.filter(a => a.category === currentCategory);
-            }
-
-            if (searchQuery) {
-                filtered = filtered.filter(a => a.title.toLowerCase().includes(searchQuery));
-            }
-
-            if (filtered.length === 0) {
-                newsGrid.innerHTML = `
-                    <div class="col-span-full text-center py-16 text-slate-400">
-                        <i data-lucide="frown" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                        <p>${currentLang === 'ka' ? 'სიახლე ვერ მოიძებნა.' : 'No news found.'}</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            newsGrid.innerHTML = filtered.map(art => `
-                <article class="bg-white dark:bg-cardBg rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        ${art.thumbnail ? `<div class="h-48 overflow-hidden bg-slate-100 dark:bg-slate-900"><img src="${art.thumbnail}" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy"></div>` : ''}
-                        <div class="p-5">
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <span class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-lg">${art.sourceName}</span>
-                                <span class="text-xs text-slate-400">${timeAgo(art.pubDate)}</span>
-                            </div>
-                            <h2 class="font-bold text-base leading-snug mb-3 line-clamp-3 hover:text-indigo-600 transition-colors">
-                                <a href="${art.link}" target="_blank" rel="noopener noreferrer">${art.title}</a>
-                            </h2>
-                        </div>
-                    </div>
-                    <div class="p-5 pt-0">
-                        <a href="${art.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
-                            ${currentLang === 'ka' ? 'სრულად წაკითხვა' : 'Read full'} <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
-                </article>
-            `).join('');
-
-            lucide.createIcons();
-        }
-
-        function timeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            const intervals = {
-                year: 31536000, month: 2592000, week: 604800, day: 86400, hour: 3600, minute: 60
-            };
-            if (currentLang === 'ka') {
-                if (seconds < 60) return 'ახლახანს';
-                if (seconds < 3600) return Math.floor(seconds / 60) წუთის წინ;
-                if (seconds < 86400) return Math.floor(seconds / 3600) საათის წინ;
-                return Math.floor(seconds / 86400) დღის წინ;
-            } else {
-                if (seconds < 60) return 'Just now';
-                if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-                if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-                return Math.floor(seconds / 86400) + 'd ago';
-            }
-        }
-    </script>
+load();
+setInterval(() => { if (!document.hidden) load(true); }, REFRESH_MS);   // ავტომატური განახლება
+</script>
 </body>
 </html>
